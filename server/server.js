@@ -8,7 +8,9 @@ var {User} = require('./models/user');
 
 var app = express();
 
-// Here we set up our routes - this is the POST routes
+// Here we set up our routes
+// - this is the GET routes
+
 app.use(bodyParser.json());
 app.post('/todos',  (req, res) => {
   //console.log(req.body);
@@ -23,6 +25,14 @@ app.post('/todos',  (req, res) => {
   });
 });
 
+// - this is the GET routes
+app.get('/todos', (req, res) => {
+  Todo.find().then((todos)=>{
+    res.send({todos});
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
 
 
 app.listen(3000, () => {
