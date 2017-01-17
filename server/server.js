@@ -1,3 +1,4 @@
+const {ObjectID} = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -32,6 +33,37 @@ app.get('/todos', (req, res) => {
   }, (e) => {
     res.status(400).send(e);
   });
+});
+
+
+//Here we demonstrate how to create an api route for fetching an individual Todo
+//GET /todos/1234324. the 1234324 part needs to be dynamic. Example below Id is dynamic
+app.get('/todos/:id', (req, res) => {
+  var id = req.params.id;
+  //res.send(req.params);  // This was just to show that we actually got the id value
+
+   //Challenge
+    //Validate id using isValid
+      if(!ObjectID.isValid(id)) {
+        console.log('ID not valid');
+        // 404 - Send back empty send
+        return res.status(404).send();
+      }
+
+
+  //findById
+   //Success
+    //if there is todo - send it back
+    // if no todo - send back 404 with empty body.
+   // error
+     //400-send empty body back
+     Todo.findById(id).then((todo) => {
+       if (!todo) {
+         console.log('Id not found');
+         return res.status(404).send();
+       }
+       res.send({todo});
+     }).catch((e) => res.status(400).send());
 });
 
 
