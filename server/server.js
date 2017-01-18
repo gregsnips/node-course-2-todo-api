@@ -68,6 +68,32 @@ app.get('/todos/:id', (req, res) => {
 });
 
 
+//Deleting todos
+app.delete('/todos/:id', (req, res) => {
+  //Challenge
+
+  //get the id
+  var id = req.params.id;
+
+  //validate the id -> not valid? Return 404
+  if(!ObjectID.isValid(id)) {
+    // 404 - Send back empty send
+    return res.status(404).send();
+  }
+       //Remove todo by id
+       Todo.findByIdAndRemove(id).then((todo) => {
+         //Success
+           //if no doc, send a 404
+         if (!todo) {
+           return res.status(404).send();
+         }
+           //if doc, send doc back with 200 (no need to specify 200 its default for success)
+         res.send({todo});
+         //error
+            //send 400 with empty body
+       }).catch((e) => res.status(400).send());
+})
+
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
 })
