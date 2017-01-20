@@ -176,6 +176,8 @@ describe('PATCH /todos/:id', () => {
 
  });
  });
+
+
    it('should clear completedAt when todo is not completed', (done) => {
  //   //grab id of second todo item
  var hexId = todos[1]._id.toHexString();
