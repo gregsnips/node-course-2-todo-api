@@ -12,7 +12,7 @@ var app = express();
 const port = process.env.PORT || 3000;
 
 // Here we set up our routes
-// - this is the GET routes
+// - this is the POST routes
 
 app.use(bodyParser.json());
 app.post('/todos',  (req, res) => {
