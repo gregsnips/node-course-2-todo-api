@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs')
 
 var UserSchema = new mongoose.Schema({
   email: {
@@ -54,6 +55,7 @@ var UserSchema = new mongoose.Schema({
 
 
 
+
 UserSchema.statics.findByToken = function (token){
   var User = this;
   var decoded;
@@ -64,7 +66,7 @@ UserSchema.statics.findByToken = function (token){
       // return new Promise((resolve, reject)=>{
       //   reject();
       // })
-      //The commented out code above is the same as the promise.reject below 
+      //The commented out code above is the same as the promise.reject below
       return Promise.reject()   ;
   }
 
@@ -74,6 +76,39 @@ UserSchema.statics.findByToken = function (token){
     'tokens.access': 'auth'
   })
 };
+
+
+
+UserSchema.pre('save', function(next) {
+  var user = this;
+
+  if (user.isModified('password')) {
+    //Challenge
+    //user.password
+
+    //user.password = hash
+    //next()
+    //Add the preceding 2 lines inside the callback function for hash
+    //You also have to call gensalt function you have to call the hash function
+    bcrypt.genSalt(10, (err, salt) =>{
+      bcrypt.hash(user.password, salt, (err, hash) => {
+    //    console.log(hash);
+          user.password = hash;
+          next();
+      });
+    });
+
+
+   //user.password = hash;
+
+
+  //  bcrypt.compare(password, user.password, (err, res)=> {
+  //    console.log(res);
+  //  });
+  } else {
+   next();
+  };
+})
 
 var User = mongoose.model('User', UserSchema);
 
