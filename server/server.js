@@ -9,6 +9,7 @@ var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
+const bcrypt = require('bcryptjs');
 
 var app = express();
 const port = process.env.PORT;
@@ -148,6 +149,46 @@ app.post('/users',  (req, res) => {
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
+
+//Challenge: create a new route POST /users/login {email, password}
+app.post('/users/login', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+
+  User.findByCredentials(body.email, body.password).then((user) => {
+    //res.send(user);
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user);
+    })
+  }).catch((e) =>{
+    res.status(400).send();
+  });
+
+  //The commented out lines below are my own implementation of this Challenge
+  // email = body.email;
+  // User.findOne({email}).then((user) => {
+  //
+  //     if(!user){
+  //       return res.status(404).send('email not found');
+  //     }
+  //      else {
+  //        bcrypt.compare(body.password, user.password, (err, result)=> {
+  //          //return res;
+  //          //console.log(res);
+  //        if (!result){
+  //          return res.status(404).send('incorrect password');
+  //        }
+  //        res.send({user});
+  //      });
+  //     };
+  //
+  //
+  //   });
+
+
+
+});
+
+
 
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
