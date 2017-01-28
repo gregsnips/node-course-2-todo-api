@@ -92,19 +92,10 @@ UserSchema.pre('save', function(next) {
     //You also have to call gensalt function you have to call the hash function
     bcrypt.genSalt(10, (err, salt) =>{
       bcrypt.hash(user.password, salt, (err, hash) => {
-    //    console.log(hash);
           user.password = hash;
           next();
       });
     });
-
-
-   //user.password = hash;
-
-
-  //  bcrypt.compare(password, user.password, (err, res)=> {
-  //    console.log(res);
-  //  });
   } else {
    next();
   };
