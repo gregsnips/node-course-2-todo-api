@@ -54,7 +54,16 @@ var UserSchema = new mongoose.Schema({
   };
 
 
+UserSchema.methods.removeToken = function (token) {
+  //for this we will use a mongodb specaial operator called $pull to remove tokens that matches what we passed in
+  var user = this;
 
+  return user.update({
+    $pull : {
+      tokens:{token}
+    }
+  });
+};
 
 UserSchema.statics.findByToken = function (token){
   var User = this;

@@ -306,7 +306,7 @@ describe('POST /users/login', () => {
        if(err) {
          return done(err) ;
        }
-       User.findById(users[1]._id).then((user) => {
+       User.findById(users[1]._id).then((user) => {  //Using a 'then' callback to do something i the user exists
          expect(user.tokens[0]).toInclude({
            access: 'auth',
            token: res.headers['x-auth']
