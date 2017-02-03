@@ -43,3 +43,19 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
 
   db.close();
 });
+
+
+//Connecting to heroku's mongo db via robo mongo
+/***********************
+mongodb://heroku_s6dnhvg4:p3q4okoncv56tkl5ks90u45bfe@ds117829.mlab.com:17829/heroku_s6dnhvg4
+from the above we can extract the information we need to connect, please note the pattern
+
+Username: heroku_s6dnhvg4
+password: p3q4okoncv56tkl5ks90u45bfe
+address: ds117829.mlab.com
+port: 17829
+database: heroku_s6dnhvg4
+
+
+
+*************************/
