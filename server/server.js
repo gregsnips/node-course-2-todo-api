@@ -18,10 +18,11 @@ const port = process.env.PORT;
 // - this is the POST routes
 
 app.use(bodyParser.json());
-app.post('/todos',  (req, res) => {
+app.post('/todos', authenticate, (req, res) => {
   //console.log(req.body);
   var todo = new Todo({
-    text: req.body.text
+    text: req.body.text,
+    _creator: req.user._id
   });
 
   todo.save().then((doc) => {
@@ -32,8 +33,10 @@ app.post('/todos',  (req, res) => {
 });
 
 // - this is the GET routes
-app.get('/todos', (req, res) => {
-  Todo.find().then((todos)=>{
+app.get('/todos', authenticate, (req, res) => {
+  Todo.find({
+    _creator: req.user._id      //By adding authenticate and including user id in find()
+  }).then((todos)=>{             //we ensure user will only see his own todo that he posted
     res.send({todos});
   }, (e) => {
     res.status(400).send(e);
@@ -43,7 +46,7 @@ app.get('/todos', (req, res) => {
 
 //Here we demonstrate how to create an api route for fetching an individual Todo
 //GET /todos/1234324. the 1234324 part needs to be dynamic. Example below Id is dynamic
-app.get('/todos/:id', (req, res) => {
+app.get('/todos/:id', authenticate, (req, res) => {
   var id = req.params.id;
   //res.send(req.params);  // This was just to show that we actually got the id value
 
@@ -62,7 +65,10 @@ app.get('/todos/:id', (req, res) => {
     // if no todo - send back 404 with empty body.
    // error
      //400-send empty body back
-     Todo.findById(id).then((todo) => {
+     Todo.findOne({
+       _id: id,
+       _creator: req.user._id
+     }).then((todo) => {
        if (!todo) {
         // console.log('Id not found');
          return res.status(404).send();
@@ -73,7 +79,7 @@ app.get('/todos/:id', (req, res) => {
 
 
 //Deleting todos
-app.delete('/todos/:id', (req, res) => {
+app.delete('/todos/:id', authenticate, (req, res) => {
   //Challenge
 
   //get the id
@@ -85,7 +91,10 @@ app.delete('/todos/:id', (req, res) => {
     return res.status(404).send();
   }
        //Remove todo by id
-       Todo.findByIdAndRemove(id).then((todo) => {
+       Todo.findOneAndRemove({
+         _id: id,
+         _creator: req.user._id
+       }).then((todo) => {
          //Success
            //if no doc, send a 404
          if (!todo) {
@@ -99,7 +108,7 @@ app.delete('/todos/:id', (req, res) => {
 })
 
 
-app.patch('/todos/:id', (req, res) => {
+app.patch('/todos/:id', authenticate, (req, res) => {
   var id = req.params.id;
   var body = _.pick(req.body, ['text', 'completed']);
   if(!ObjectID.isValid(id)) {
@@ -114,8 +123,11 @@ app.patch('/todos/:id', (req, res) => {
     body.completedAt = null;
   }
 
-
-Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) =>{
+//For the challenge to make this route private use findOneAndUpdate
+Todo.findOneAndUpdate({
+  _id: id,
+  _creator: req.user._id
+}, {$set: body}, {new: true}).then((todo) =>{
   if (!todo) {
     return res.status(404).send();
   }
